@@ -8,9 +8,22 @@
 
 #if defined(__cpp_lib_span) || __cplusplus >= 202002L
 #include <span>
+/**
+ * @typedef Span
+ * @brief Alias for std::span in C++20 or later.
+ */
 template <typename T>
 using Span = std::span<T>;
 #else
+/**
+ * @class Span
+ * @brief A lightweight non-owning view over a contiguous sequence of objects.
+ * 
+ * Provides a subset of C++20 std::span functionality for C++17 projects.
+ * Useful for passing around array references without losing size information.
+ * 
+ * @tparam T The type of elements in the span.
+ */
 // -----------------------------------------------------------------------------
 // Enhanced C++17 Span<T>
 // - forward iterator
@@ -72,29 +85,42 @@ public:
         pointer ptr_;
     };
 
-    // -------------------------------------------------------------------------
-    // Span core
-    // -------------------------------------------------------------------------
+    /** @brief Constructs an empty Span. */
     constexpr Span() noexcept : data_{nullptr}, size_{0} {}
 
+    /**
+     * @brief Constructs a Span from a pointer and a size.
+     * @param data Pointer to the start of the sequence.
+     * @param size Number of elements.
+     */
     constexpr Span(pointer data, const size_type size) noexcept
         : data_{data}, size_{size} {}
 
+    /** @brief Returns a pointer to the beginning of the sequence. */
     [[nodiscard]] constexpr pointer    data()  const noexcept { return data_; }
+
+    /** @brief Returns the number of elements in the Span. */
     [[nodiscard]] constexpr size_type size()   const noexcept { return size_; }
+
+    /** @brief Checks if the Span is empty. */
     [[nodiscard]] constexpr bool      empty()  const noexcept { return size_ == 0; }
 
+    /** @brief Accesses an element by index. */
     [[nodiscard]] constexpr reference operator[](size_type idx) const {
         return data_[idx];
     }
 
+    /** @brief Returns an iterator to the beginning. */
     [[nodiscard]] constexpr iterator begin()  const noexcept { return iterator{data_}; }
+
+    /** @brief Returns an iterator to the end. */
     [[nodiscard]] constexpr iterator end()    const noexcept { return iterator{data_ + size_}; }
 
-    // -------------------------------------------------------------------------
-    // subspan(offset, count)
-    // Returns a view starting at offset, length = min(count, remaining)
-    // -------------------------------------------------------------------------
+    /**
+     * @brief Returns a sub-span.
+     * @param offset Starting position.
+     * @param count Number of elements.
+     */
     [[nodiscard]] constexpr Span subspan(size_type offset, size_type count) const noexcept {
         if (offset >= size_) {
             return Span{};  // empty span
@@ -104,10 +130,9 @@ public:
         return Span{data_ + offset, n};
     }
 
-    // -------------------------------------------------------------------------
-    // first(n)
-    // last(n)
-    // -------------------------------------------------------------------------
+    /**
+     * @brief Returns a Span containing the first @p count elements.
+     */
     [[nodiscard]] constexpr Span first(size_type count) const noexcept {
         if (count >= size_) {
             return *this;
@@ -115,6 +140,9 @@ public:
         return Span{data_, count};
     }
 
+    /**
+     * @brief Returns a Span containing the last @p count elements.
+     */
     [[nodiscard]] constexpr Span last(size_type count) const noexcept {
         if (count >= size_) {
             return *this;

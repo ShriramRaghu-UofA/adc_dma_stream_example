@@ -5,25 +5,65 @@
 #include "Span.h"
 
 
-/*
- *NOTE: Buffers are static and are shared across all instances of a given size!! Be careful not to double instantiate stuff.
- *NOTE: AnalogBufferDMA uses millis() to detect triggers. Make sure the buffer size is large enough to hold at least one ms of data!
+/**
+ * @class ADCDMAStream
+ * @brief Manages DMA-backed double buffering for ADC data.
+ * 
+ * This class handles the low-level DMA configuration and buffer management. 
+ * It uses two static buffers to allow the ADC to write to one while the application 
+ * processes the other.
+ * 
+ * @note Buffers are static and are shared across all instances of a given size.
+ * @note AnalogBufferDMA uses millis() to detect triggers. Ensure BufferSize is large 
+ *       enough to hold at least 1ms of data.
+ * 
+ * @tparam BufferSize Number of samples (uint16_t) per buffer. 
+ *                    Must be > 0 and a multiple of 32 for DMA alignment.
  */
-
 template <std::size_t BufferSize>
 class ADCDMAStream final {
 public:
     static_assert(BufferSize > 0, "BufferSize must be greater than zero");
     static_assert(BufferSize * sizeof(uint16_t) % 32 == 0, "BufferSize must be a multiple of 32 for DMA alignment");
+    
+    /**
+     * @brief Constructs an ADCDMAStream.
+     */
     ADCDMAStream() noexcept;
 
-    // Initialize with ADC driver pointer; returns success/failure
+    /**
+     * @brief Initializes the DMA stream for a specific ADC module.
+     * 
+     * @param adc Pointer to the ADC hardware instance.
+     * @param adcIndex Index of the ADC (usually 0 or 1).
+     * @return true if initialization succeeded, false otherwise.
+     */
     [[nodiscard]] bool initialize(ADC* adc, int8_t adcIndex) noexcept;
 
+    /**
+     * @brief Checks if a buffer is full and ready for processing.
+     * @return true if a buffer is ready.
+     */
     [[nodiscard]] bool hasFullBuffer() noexcept;
+
+    /**
+     * @brief Attempts to acquire the current full buffer.
+     * 
+     * @param[out] out A Span pointing to the acquired buffer data if successful.
+     * @return true if a buffer was acquired, false if none was available.
+     */
     [[nodiscard]] bool tryAcquire(Span<const uint16_t>& out) noexcept;
+
+    /**
+     * @brief Releases the currently held buffer back to the DMA system.
+     * 
+     * Must be called after processing the buffer acquired via tryAcquire().
+     */
     void releaseBuffer() noexcept;
 
+    /**
+     * @brief Returns the size of the buffers.
+     */
     [[nodiscard]] static constexpr std::size_t bufferSize() noexcept { return BufferSize; }
 
 private:

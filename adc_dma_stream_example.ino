@@ -3,6 +3,7 @@
 #include "include/ADCDMAStream.h"
 #include "include/ADCDriver.h"
 #include "include/ADCSampler.h"
+#include "include/SharedArrayGuard.h"
 
 namespace {
     constexpr std::size_t kBufferSize = 32;
@@ -35,16 +36,6 @@ void setup() {
     }
 
     pinMode(LED_BUILTIN, OUTPUT);
-    
-    // ORDER MATTERS! Need to initialize stream before setting ADC properties.
-
-    // if (!stream.initialize(&adc, driver.adcIndex())) {
-    //     fail_loop("Failed to initialize ADC DMA stream");
-    // }
-    //
-    // if (!driver.begin()) {
-    //     fail_loop("Failed to begin ADC driver");
-    // }
 
     if (!sampler.begin()) {
         fail_loop("Failed to begin ADC sampler");
@@ -58,7 +49,8 @@ void setup() {
 void loop() {
     static uint32_t last_data_ms = millis();
     static bool led_state = false;
-    if (Span<const uint16_t> block; stream.tryAcquire(block)) {
+    if (const SharedArrayGuard guard{sampler}; guard.isValid()) {
+        const auto block = guard.get();
         const uint32_t now = millis();
         // Example: compute simple min/max on this block and print.
         uint16_t min_val = 0xFFFFu;
@@ -80,15 +72,14 @@ void loop() {
                       static_cast<unsigned>(now - last_data_ms));
 
         last_data_ms = now;
-        stream.releaseBuffer();
+        // stream.releaseBuffer();
     }
 
     // Optional: lightweight "heartbeat" if nothing for a while, etc.
     // Heartbeat: 1 Hz flash only if no data for >= 1000 ms
     const uint32_t now = millis();
-    const uint32_t silence = now - last_data_ms;
 
-    if (silence >= 2000) {
+    if (const uint32_t silence = now - last_data_ms; silence >= 2000) {
         // toggle LED every 1000 ms
         if (silence % 1000 == 0) {
             led_state = !led_state;

@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <memory>
-#include "include/ADCDMAStream.h"
-#include "include/ADCDriver.h"
-#include "include/ADCSampler.h"
-#include "include/SharedArrayGuard.h"
+#include "../include/ADCDMAStream.h"
+#include "../include/ADCDriver.h"
+#include "../include/ADCSampler.h"
+#include "../include/SharedArrayGuard.h"
 
 namespace {
     constexpr std::size_t kBufferSize = 32;

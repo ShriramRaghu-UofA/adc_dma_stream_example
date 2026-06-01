@@ -6,16 +6,16 @@
 #include "../include/SharedArrayGuard.h"
 
 namespace {
-    constexpr std::size_t kBufferSize = 32;
+    constexpr std::size_t kBufferSize = 512 * 63;
     constexpr uint8_t kADCIndex = 0;
     constexpr uint8_t kPin = A9;
-    constexpr uint32_t kSampleRateHz = 64U;
+    constexpr uint32_t kSampleRateHz = 32000U;
     constexpr uint8_t kAveraging = 0U;
     constexpr uint8_t kResolutionBits = 12U;
     ADC adc{};
     ADCDriver driver{adc, kADCIndex, kPin, kSampleRateHz, kAveraging, kResolutionBits};
     ADCDMAStream<kBufferSize> stream{};
-    ADCSampler sampler{driver, stream};
+    ADCSampler<kBufferSize> sampler{driver, stream};
 }  // namespace
 
 

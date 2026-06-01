@@ -37,5 +37,13 @@ void ADCSampler<BufferSize>::releaseBuffer() noexcept
 
 template class ADCSampler<32>;
 template class ADCSampler<64>;
+template class ADCSampler<128>;
+template class ADCSampler<256>;
+template class ADCSampler<512>;
 template class ADCSampler<1024>;
 template class ADCSampler<2048>;
+template class ADCSampler<4096>;
+template class ADCSampler<8192>;
+template class ADCSampler<16384>;
+template class ADCSampler<32256>;
+template class ADCSampler<32736>;

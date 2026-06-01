@@ -18,13 +18,15 @@
  *       enough to hold at least 1ms of data.
  * 
  * @tparam BufferSize Number of samples (uint16_t) per buffer. 
- *                    Must be > 0 and a multiple of 32 for DMA alignment.
+ *                    Must be > 0, < 32768, and a multiple of 32 for DMA alignment.
  */
 template <std::size_t BufferSize>
 class ADCDMAStream final {
 public:
     static_assert(BufferSize > 0, "BufferSize must be greater than zero");
     static_assert(BufferSize * sizeof(uint16_t) % 32 == 0, "BufferSize must be a multiple of 32 for DMA alignment");
+    static_assert(BufferSize < 32768, "BufferSize must be less than 32768 to avoid overflow");
+
     
     /**
      * @brief Constructs an ADCDMAStream.

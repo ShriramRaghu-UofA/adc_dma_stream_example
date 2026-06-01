@@ -66,5 +66,13 @@ void ADCDMAStream<BufferSize>::releaseBuffer() noexcept
 // Explicit instantiations (optional)
 template class ADCDMAStream<32>;
 template class ADCDMAStream<64>;
+template class ADCDMAStream<128>;
+template class ADCDMAStream<256>;
+template class ADCDMAStream<512>;
 template class ADCDMAStream<1024>;
 template class ADCDMAStream<2048>;
+template class ADCDMAStream<4096>;
+template class ADCDMAStream<8192>;
+template class ADCDMAStream<16384>;
+template class ADCDMAStream<32256>;
+template class ADCDMAStream<32736>;

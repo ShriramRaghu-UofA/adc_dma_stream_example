@@ -75,8 +75,8 @@ private:
 
     // Header-defined static storage per template instantiation
     static inline DMAMEM __attribute__((aligned(32)))
-        volatile uint16_t s_buffer1[BufferSize];
+        uint16_t s_buffer1[BufferSize];
 
     static inline DMAMEM __attribute__((aligned(32)))
-        volatile uint16_t s_buffer2[BufferSize];
+        uint16_t s_buffer2[BufferSize];
 };

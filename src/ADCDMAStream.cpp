@@ -47,7 +47,7 @@ bool ADCDMAStream<BufferSize>::tryAcquire(Span<const uint16_t>& out) noexcept
         arm_dcache_delete(p, BufferSize * sizeof(uint16_t));
     }
 #endif
-
+    //Casting away the volatile here is fine since the original buffer wasn't declared volatile.
     out = Span(const_cast<const uint16_t*>(raw), count);
     m_hasPending = true;
 
